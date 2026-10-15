@@ -128,6 +128,7 @@ class SpeechCommands:
     """
 
     domain = "audio"
+    templates = TEMPLATES
 
     def __init__(self, split: str, root=DATA_DIR):
         assert split in ("train", "val", "test")
