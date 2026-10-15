@@ -1,0 +1,11 @@
+# A reduced grid for a quick look on the GPU. The LR is a fixed guess, not
+# the result of the LR sweep, so these runs are not used in any fit.
+sizes: [S1, S2, S3]
+budgets: [2000000, 5000000]
+lr: {S1: 1.0e-3, S2: 1.0e-3, S3: 1.0e-3}
+batch_size: 32
+shares: {image: 0.3333, audio: 0.3333, text: 0.3334}
+seed: 0
+eval_examples: 1000
+log_every: 50
+device: auto
