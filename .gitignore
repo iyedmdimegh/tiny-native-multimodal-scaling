@@ -1,0 +1,11 @@
+# Large or generated files. Data and runs can also live outside the repo
+# through TNMS_DATA_DIR and TNMS_RUNS_DIR.
+/data/
+/runs/
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Personal study notes, never pushed.
+UNDERSTANDING.md
