@@ -1,0 +1,7 @@
+# Model shapes. N (non-embedding parameters) is counted from the built model,
+# these comments are only the rough 12 * L * d^2 estimate.
+S1: {d_model: 64,  n_layers: 2, n_heads: 1}   # ~0.1M
+S2: {d_model: 128, n_layers: 4, n_heads: 2}   # ~0.8M
+S3: {d_model: 192, n_layers: 6, n_heads: 3}   # ~2.7M
+S4: {d_model: 256, n_layers: 8, n_heads: 4}   # ~6.3M
+S5: {d_model: 384, n_layers: 8, n_heads: 6}   # ~14M
