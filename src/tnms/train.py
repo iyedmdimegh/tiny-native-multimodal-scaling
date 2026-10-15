@@ -86,6 +86,28 @@ def write_json_atomic(path: Path, data: dict):
     os.replace(tmp, path)
 
 
+def overfit_one_batch(model, batch: dict, device: str, steps: int, lr: float) -> list[float]:
+    """Sanity control: train on one fixed batch again and again.
+
+    Any working model, loss and optimiser can memorise 32 sequences, so the
+    loss should fall close to zero. If it stalls, gradients are not reaching
+    the parameters or the targets cannot be predicted from the inputs.
+    """
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, betas=(0.9, 0.95), weight_decay=0.0)
+    batch = to_device(batch, device)
+    losses = []
+    for _ in range(steps):
+        with autocast(device):
+            logits = model(batch)
+        loss = F.cross_entropy(logits.float().flatten(0, 1), batch["targets"].flatten(), ignore_index=IGNORE)
+        opt.zero_grad(set_to_none=True)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        opt.step()
+        losses.append(loss.item())
+    return losses
+
+
 def run(cfg: dict, run_dir: Path, datasets: dict | None = None) -> dict:
     """Train one model and return its summary.
 
