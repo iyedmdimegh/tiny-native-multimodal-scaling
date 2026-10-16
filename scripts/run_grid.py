@@ -7,8 +7,18 @@ smallest D finish before any larger D starts.
 
 import argparse
 
-from tnms.config import RUNS_DIR, load_yaml, model_shape
+import pandas as pd
+
+from tnms.config import RUNS_DIR, load_yaml, results_dir, run_config
 from tnms.train import run
+
+
+def learning_rates(preset_name: str, preset: dict) -> dict:
+    """LR per size: written in the preset, or the best one from the LR sweep."""
+    if preset["lr"] != "sweep":
+        return preset["lr"]
+    table = pd.read_csv(results_dir(preset_name) / "lr_sweep.csv")
+    return dict(zip(table[table["best"]]["size"], table[table["best"]]["lr"]))
 
 
 def main():
@@ -16,6 +26,7 @@ def main():
     parser.add_argument("--preset", default="smoke")
     args = parser.parse_args()
     preset = load_yaml(args.preset)
+    lrs = learning_rates(args.preset, preset)
 
     for tokens in preset["budgets"]:
         for size in preset["sizes"]:
@@ -24,19 +35,7 @@ def main():
             if (run_dir / "summary.json").exists():
                 print(f"skip {run_id}, already done")
                 continue
-            cfg = {
-                "size": size,
-                **model_shape(size),
-                "tokens": tokens,
-                "lr": preset["lr"][size],
-                "batch_size": preset["batch_size"],
-                "shares": preset["shares"],
-                "seed": preset["seed"],
-                "eval_examples": preset["eval_examples"],
-                "log_every": preset["log_every"],
-                "device": preset.get("device", "auto"),
-            }
-            run(cfg, run_dir)
+            run(run_config(preset, size, tokens, lrs[size]), run_dir)
 
 
 if __name__ == "__main__":
