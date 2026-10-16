@@ -43,11 +43,15 @@ def domain_loss(
     `patches` is only for the ablation control:
     - "real": the normal evaluation.
     - "zero": every patch vector replaced by zeros.
-    - "other": each example gets the patches of the next example in the batch,
-      so the caption no longer matches the input.
+    - "other": each example gets the patches of a random other example from
+      the subset, so the caption no longer matches the input. The partner is
+      drawn from a fixed shuffle of the whole subset, not from neighbours in
+      the batch: Speech Commands files are sorted by word, so neighbours
+      almost always share the label.
     """
     model.eval()
     idx = fixed_subset(len(dataset), n_examples)
+    partner = np.random.default_rng(EVAL_SUBSET_SEED + 1).permutation(idx).tolist()
     total, count = 0.0, 0
     for start in range(0, len(idx), batch_size):
         batch = collate([dataset.get(i) for i in idx[start : start + batch_size]], tokenizer)
@@ -55,7 +59,7 @@ def domain_loss(
         if patches == "zero":
             batch[key] = torch.zeros_like(batch[key])
         elif patches == "other":
-            batch[key] = batch[key].roll(1, dims=0)
+            batch[key] = torch.stack([dataset.get(j)["patches"] for j in partner[start : start + batch_size]])
         batch = to_device(batch, device)
         with autocast(device):
             logits = model(batch)
