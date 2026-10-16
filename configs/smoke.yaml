@@ -2,6 +2,9 @@
 sizes: [S1, S2]
 budgets: [200000]          # D, non-pad input tokens per run
 lr: {S1: 1.0e-3, S2: 1.0e-3}
+lr_sweep:
+  tokens: 100000
+  lrs: [1.0e-3, 2.0e-3, 4.0e-3]
 batch_size: 32
 shares: {image: 0.3333, audio: 0.3333, text: 0.3334}
 seed: 0
