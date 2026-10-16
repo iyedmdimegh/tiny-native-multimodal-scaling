@@ -1,7 +1,7 @@
 PYTHON ?= python
 TORCH_INDEX = https://download.pytorch.org/whl/cu128
 
-.PHONY: setup data smoke test benchmark lr_sweep grid
+.PHONY: setup data smoke test benchmark lr_sweep grid fit figures
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt --extra-index-url $(TORCH_INDEX)
@@ -21,6 +21,12 @@ lr_sweep:
 
 grid:
 	$(PYTHON) scripts/run_grid.py --preset full
+
+fit:
+	$(PYTHON) scripts/fit_scaling.py
+
+figures:
+	$(PYTHON) scripts/make_figures.py
 
 test:
 	$(PYTHON) -m pytest -q
