@@ -1,0 +1,23 @@
+{
+  "tokens_per_sec": {
+    "S1": 215004.0,
+    "S2": 203853.0,
+    "S3": 115499.0,
+    "S4": 66805.0,
+    "S5": 42015.0
+  },
+  "mean_tokens_per_example": {
+    "image": 85.92,
+    "audio": 107.516,
+    "text": 128.0
+  },
+  "hours": {
+    "lr_sweep (5 sizes x 5 LRs at 10M)": 0.7914530333363416,
+    "grid (5 sizes x 5 budgets)": 2.4535044033426594,
+    "noise seeds (2 extra each: S2 10M, S3 20M, S4 40M)": 0.45609678149363075,
+    "LR check at 80M (2 neighbours for S1 and S5)": 1.264537764580197,
+    "shuffled-label control (S2 10M)": 0.013626376740974026,
+    "mixture sweep (13 runs S4 40M)": 2.162180142870211,
+    "mixture validation (3 fresh runs S4 40M)": 0.4989646483546641
+  }
+}
