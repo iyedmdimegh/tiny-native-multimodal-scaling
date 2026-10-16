@@ -8,6 +8,11 @@ lr_sweep:
 batch_size: 32             # fixed for every run, not scaled with N or D
 shares: {image: 0.3333, audio: 0.3333, text: 0.3334}
 seed: 0
+noise_seeds: [1, 2]        # extra seeds for the noise cells below
+noise_cells: [[S2, 10000000], [S3, 20000000], [S4, 40000000]]
+lr_check:                  # rerun these sizes at this budget with the two neighbouring LRs
+  tokens: 80000000
+  sizes: [S1, S5]
 eval_examples: 2000        # held-out examples per domain
 log_every: 50
 device: auto
