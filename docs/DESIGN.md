@@ -51,3 +51,11 @@ Each entry says what was chosen and why, in a few sentences.
 **Schedule from the first 200 batches.** Batches differ in token count, so the number of steps for a budget D is not known in advance. We draw the first 200 batches, take their mean token count, and fix the cosine schedule from that. Those same batches are then used for training, so the data order is unchanged.
 
 **bf16 autocast.** The local GPU (RTX 3050, compute 8.6) supports bf16, which needs no loss scaling. On GPUs without bf16 the code falls back to fp16 with a GradScaler.
+
+**No torch.compile.** It needs Triton, which has no official Windows build, and the brief only allows the listed packages. Everything runs in eager mode. The benchmark in `results/benchmark.json` is measured that way.
+
+**LR selection.** For each size, LR is chosen by the lowest validation loss averaged over the three domains, at D = 10M tokens with one seed. If the best LR is the smallest or largest tried, the sweep adds half or double that value and reruns, up to two times. The test split plays no part.
+
+**The grid reads the swept LR.** The full preset says `lr: sweep` and the grid runner reads the best LR per size from `results/lr_sweep.csv`. Copying numbers by hand into a config is an easy place for a mistake to hide.
+
+**Only the full preset writes to results/.** Smoke and small presets write their tables next to their runs, so a quick check can never overwrite the committed numbers.
