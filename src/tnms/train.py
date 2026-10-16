@@ -86,6 +86,16 @@ def write_json_atomic(path: Path, data: dict):
     os.replace(tmp, path)
 
 
+def shuffle_labels(dataset, seed: int):
+    """Control 3: give every training image the label of another, fixed for the whole run.
+
+    The captions keep their real distribution, but they no longer say anything
+    about the image. A model trained this way can at best learn the label
+    frequencies, so its held-out image loss should sit at the no-input floor.
+    """
+    dataset.labels = np.random.default_rng(seed).permutation(dataset.labels)
+
+
 def overfit_one_batch(model, batch: dict, device: str, steps: int, lr: float) -> list[float]:
     """Sanity control: train on one fixed batch again and again.
 
@@ -122,8 +132,10 @@ def run(cfg: dict, run_dir: Path, datasets: dict | None = None) -> dict:
     tokenizer = load_tokenizer()
     if datasets is None:
         datasets = {split: load_datasets(split) for split in ("train", "val", "test")}
+    if cfg.get("shuffle_image_labels"):
+        shuffle_labels(datasets["train"]["image"], cfg["seed"])
 
-    model = Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"]).to(device)
+    model =Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"]).to(device)
     n_params = count_non_embedding_params(model)
     print(f"[{run_dir.name}] N = {n_params:,} non-embedding parameters, device = {device}")
 
