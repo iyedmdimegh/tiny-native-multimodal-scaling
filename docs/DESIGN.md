@@ -59,3 +59,23 @@ Each entry says what was chosen and why, in a few sentences.
 **The grid reads the swept LR.** The full preset says `lr: sweep` and the grid runner reads the best LR per size from `results/lr_sweep.csv`. Copying numbers by hand into a config is an easy place for a mistake to hide.
 
 **Only the full preset writes to results/.** Smoke and small presets write their tables next to their runs, so a quick check can never overwrite the committed numbers.
+
+**Noise seeds and the LR check share the grid runner.** One resumable queue runs the grid, the extra seeds and the 80M LR neighbours, ordered by budget. It can be left alone for hours and restarted after a crash without losing finished runs.
+
+## Fitting
+
+**Fit on seed 0 only.** The three noise cells have extra seeds, but the fit uses the seed-0 run of every cell, so each cell has the same weight. The extra seeds only give the error bars and the noise table.
+
+**Fit on the logged D, not the budget.** A run stops once it passes its budget, so the real D is a little above it. The fit uses the real value.
+
+**Bootstrap starts.** The full fit tries all 3,125 starting points, which takes about two minutes. Doing that 200 times per target is too slow, so each bootstrap refit starts from the full-data optimum plus 30 random grid points. A refit could in principle miss a far-away optimum that the full grid would find, which would make the intervals a bit too narrow.
+
+**Baseline for the holdouts.** The brief asks for a naive baseline. For the largest-N holdout it is a separate law L = E + A / N^alpha for each D, fitted on S1 to S4. For the largest-D holdout it is a separate L = E + B / D^beta for each size, fitted on the four smaller budgets. Both use the same Huber fit as the main law.
+
+**Empirical frontier.** Runs are sorted by compute 6ND. A run is on the frontier if its loss is lower than every run with less compute.
+
+## Controls
+
+**Shuffled labels are permuted once per run.** Every training image gets the label of another image, fixed for the whole run. The caption distribution stays the same, so the model can still learn the label frequencies but nothing about which image has which label.
+
+**Sample prompts.** The five prompts in `scripts/run_controls.py` were written before generating anything, and all five outputs go into `results/samples.txt`.
