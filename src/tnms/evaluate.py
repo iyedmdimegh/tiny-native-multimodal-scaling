@@ -104,6 +104,6 @@ def caption_entropy_floor(dataset, tokenizer, n_examples: int) -> dict:
 def load_model(run_dir, device: str):
     """Rebuild a trained model from its run directory."""
     cfg = json.loads((run_dir / "summary.json").read_text())["config"]
-    model = Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"]).to(device)
+    model = Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"], cfg.get("encoder_layers", 0)).to(device)
     model.load_state_dict(torch.load(run_dir / "model.pt", map_location=device))
     return model, cfg

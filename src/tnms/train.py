@@ -135,7 +135,7 @@ def run(cfg: dict, run_dir: Path, datasets: dict | None = None) -> dict:
     if cfg.get("shuffle_image_labels"):
         shuffle_labels(datasets["train"]["image"], cfg["seed"])
 
-    model =Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"]).to(device)
+    model = Model(cfg["d_model"], cfg["n_layers"], cfg["n_heads"], cfg.get("encoder_layers", 0)).to(device)
     n_params = count_non_embedding_params(model)
     print(f"[{run_dir.name}] N = {n_params:,} non-embedding parameters, device = {device}")
 

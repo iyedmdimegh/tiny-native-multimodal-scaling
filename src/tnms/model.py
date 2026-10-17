@@ -80,13 +80,21 @@ class Block(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, d_model: int, n_layers: int, n_heads: int):
+    """Early fusion by default. With encoder_layers > 0 it becomes the late-fusion
+    variant of experiment C: image and audio patches first pass through their own
+    small bidirectional transformer before entering the shared decoder."""
+
+    def __init__(self, d_model: int, n_layers: int, n_heads: int, encoder_layers: int = 0):
         super().__init__()
         self.tok_emb = nn.Embedding(VOCAB_SIZE, d_model)
         self.pos_emb = nn.Embedding(MAX_LEN, d_model)
         self.image_proj = nn.Linear(IMAGE_PATCH_DIM, d_model, bias=False)
         self.audio_proj = nn.Linear(AUDIO_PATCH_DIM, d_model, bias=False)
         self.blocks = nn.ModuleList(Block(d_model, n_heads) for _ in range(n_layers))
+        self.encoders = nn.ModuleDict({
+            name: nn.ModuleList(Block(d_model, n_heads) for _ in range(encoder_layers))
+            for name in ("image", "audio")
+        } if encoder_layers else {})
         self.norm_f = nn.RMSNorm(d_model)
         self._init_weights(n_layers)
 
@@ -97,9 +105,10 @@ class Model(nn.Module):
         for p in self.parameters():
             if p.dim() == 2:
                 nn.init.normal_(p, std=0.02)
-        for block in self.blocks:
-            for p in (block.attn.proj.weight, block.mlp.down.weight):
-                nn.init.normal_(p, std=0.02 / math.sqrt(2 * n_layers))
+        for stack in (self.blocks, *self.encoders.values()):
+            for block in stack:
+                for p in (block.attn.proj.weight, block.mlp.down.weight):
+                    nn.init.normal_(p, std=0.02 / math.sqrt(2 * len(stack)))
 
     def embed(self, batch) -> torch.Tensor:
         """Token embeddings, with patch slots replaced by projected patches."""
@@ -108,9 +117,25 @@ class Model(nn.Module):
             rows = batch[f"{name}_rows"]
             if len(rows):
                 patches = proj(batch[f"{name}_patches"])
+                if self.encoders:
+                    patches = self.encode(name, patches)
                 x[rows, PATCH_START : PATCH_START + patches.shape[1]] = patches.to(x.dtype)
         T = x.shape[1]
         return x + self.pos_emb(torch.arange(T, device=x.device))
+
+    def encode(self, name: str, patches: torch.Tensor) -> torch.Tensor:
+        """Late fusion only: run the patches through the modality's own encoder.
+
+        The encoder needs positions to tell patches apart, so it adds the same
+        position embeddings the patch slots get in the decoder. Every patch
+        sees every other patch (no mask).
+        """
+        P = patches.shape[1]
+        x = patches + self.pos_emb(torch.arange(PATCH_START, PATCH_START + P, device=patches.device))
+        full = torch.ones(1, P, P, dtype=torch.bool, device=patches.device)
+        for block in self.encoders[name]:
+            x = block(x, full)
+        return x
 
     def forward(self, batch) -> torch.Tensor:
         """Return logits (B, T, vocab). Logit at position t predicts token t + 1."""
