@@ -54,10 +54,10 @@ def _short(x, _pos=None) -> str:
     return f"{x:g}"
 
 
-def _log_axis(ax, label: str, axis: str = "x"):
+def _log_axis(ax, label: str, axis: str = "x", subs=(1, 2, 5)):
     target = ax.xaxis if axis == "x" else ax.yaxis
     (ax.set_xscale if axis == "x" else ax.set_yscale)("log")
-    target.set_major_locator(LogLocator(subs=(1, 2, 5)))  # labels even on axes shorter than a decade
+    target.set_major_locator(LogLocator(subs=subs))  # 2 and 5 give labels even on axes shorter than a decade
     target.set_major_formatter(FuncFormatter(_short))
     target.set_minor_formatter(NullFormatter())
     (ax.set_xlabel if axis == "x" else ax.set_ylabel)(label)
@@ -70,8 +70,6 @@ def budget_colors(budgets) -> dict:
 def _floor_line(ax, floors: dict, domain: str):
     if domain in floors:
         ax.axhline(floors[domain], color=MUTED, linestyle="--", linewidth=1)
-        ax.annotate("no-input floor", (0.02, floors[domain]), xycoords=("axes fraction", "data"),
-                    xytext=(0, 3), textcoords="offset points", color=MUTED, fontsize=8)
 
 
 def _save(fig, title: str, out: Path):
@@ -97,8 +95,8 @@ def learning_curves(curves: pd.DataFrame, size: str, floors: dict, out: Path):
         ax.set_title(f"{domain}: test loss")
         _log_axis(ax, "tokens seen")
     axes[0].set_ylabel("loss (nats per text token)")
-    axes[-1].legend(title="budget D", fontsize=8)
-    _save(fig, f"Test loss during training, model {size}, one run per token budget", out)
+    axes[-1].legend(title="budget D", fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
+    _save(fig, f"Test loss during training, model {size}, one run per token budget. Dashed: no-input floor", out)
 
 
 def _noise_errors(noise: pd.DataFrame, target: str) -> dict:
@@ -126,8 +124,8 @@ def loss_vs_data(grid: pd.DataFrame, fits: dict, noise: pd.DataFrame, floors: di
         ax.set_title(f"{target}: test loss")
         _log_axis(ax, "training tokens D")
     axes[0].set_ylabel("loss (nats per text token)")
-    axes[-1].legend(title="model", fontsize=8)
-    _save(fig, "Test loss against training tokens. Points are runs, lines the fitted L(N, D)", out)
+    axes[-1].legend(title="model", fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
+    _save(fig, "Test loss against training tokens. Points are runs, lines the fitted L(N, D), dashed the no-input floor", out)
 
 
 def loss_vs_params(grid: pd.DataFrame, fits: dict, floors: dict, out: Path):
@@ -144,10 +142,10 @@ def loss_vs_params(grid: pd.DataFrame, fits: dict, floors: dict, out: Path):
                     linewidth=1.2)
         _floor_line(ax, floors, target)
         ax.set_title(f"{target}: test loss")
-        _log_axis(ax, "non-embedding parameters N")
+        _log_axis(ax, "non-embedding parameters N", subs=(1,))  # N spans 2+ decades
     axes[0].set_ylabel("loss (nats per text token)")
-    axes[-1].legend(title="budget D", fontsize=8)
-    _save(fig, "Test loss against model size. Points are runs, lines the fitted L(N, D)", out)
+    axes[-1].legend(title="budget D", fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
+    _save(fig, "Test loss against model size. Points are runs, lines the fitted L(N, D), dashed the no-input floor", out)
 
 
 def holdout_predictions(holdout: pd.DataFrame, fits: dict, out: Path):
