@@ -2,7 +2,7 @@
 
 This is a toy-scale study inspired by two Apple papers. It does not replicate or compare against their results.
 
-One small decoder-only transformer is trained from scratch on three kinds of data at once: CIFAR-100 images to captions, Speech Commands audio to the spoken word, and TinyStories text. There is no image or audio encoder. Image and spectrogram patches go through one linear layer straight into the shared transformer. I measure how the loss scales with model size N and training tokens D (experiment A), how it depends on the data mixture (experiment B), and how early fusion compares to late fusion at the same size (experiment C).
+One small decoder-only transformer is trained from scratch on three kinds of data at once: CIFAR-100 images to captions, Speech Commands audio to the spoken word, and TinyStories text. There is no image or audio encoder. Image and spectrogram patches go through one linear layer straight into the shared transformer. I measure how the loss scales with model size N and training tokens D (experiment A), how it depends on the data mixture (experiment B), and how early fusion compares to late fusion at the same size (experiment C). A two-page write-up is in [REPORT.md](REPORT.md).
 
 ![Loss against training tokens](figures/fig2_loss_vs_data.png)
 
