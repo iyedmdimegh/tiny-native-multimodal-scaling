@@ -79,3 +79,5 @@ Each entry says what was chosen and why, in a few sentences.
 **Shuffled labels are permuted once per run.** Every training image gets the label of another image, fixed for the whole run. The caption distribution stays the same, so the model can still learn the label frequencies but nothing about which image has which label.
 
 **Sample prompts.** The five prompts in `scripts/run_controls.py` were written before generating anything, and all five outputs go into `results/samples.txt`.
+
+**"Below the floor" needs a margin.** `grid.csv` flags a strict comparison, test loss under the no-input floor. Several small cells are under it by less than 0.001, which is noise, not reading the input. In the write-up a domain only counts as reading the input when its loss is below the floor by more than twice the largest seed standard deviation of that domain over the three noise cells. This rule was fixed before the 40M and 80M runs had finished.
