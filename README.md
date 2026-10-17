@@ -33,7 +33,7 @@ All numbers are test loss in nats per text token, from one seed per grid cell, u
 **Experiment B: data mixtures (S4, 40M tokens)**
 
 - I trained 13 mixtures and fitted a per-domain mixture law on validation loss. In leave-three-out cross-validation over all 286 splits it beats a linear model in the shares for every domain: mean absolute error 0.004 against 0.009 for image, 0.037 against 0.041 for audio, 0.028 against 0.220 for text. The audio error is still several times the audio seed standard deviation (0.010).
-- The law's best mixture for the mean loss is (0.09, 0.34, 0.57) as (image, audio, text). With a new seed it reached a validation loss of 0.881 against a predicted 0.883. On test it scores 0.885 against 0.910 for the uniform mixture, about five times the seed standard deviation of that cell (0.005).
+- The law's best mixture for the mean loss is (0.09, 0.34, 0.57) as (image, audio, text). With a new seed it reached a validation loss of 0.881 against a predicted 0.883. On test it scores 0.885 against 0.910 for the uniform mixture, about five times the seed standard deviation of that cell (0.005). Most of the gain comes from text. Image and audio test loss are both higher than under the uniform mixture, so this mixture wins on the mean by giving up some image and audio quality.
 - The law's best mixture for image alone is (0.9, 0.05, 0.05). Predicted validation loss 0.236, observed 0.233, test 0.230 against 0.281 for uniform. The price is text test loss 3.19 and 9.3 passes over the image training set.
 
 **Controls**
