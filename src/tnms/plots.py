@@ -235,27 +235,36 @@ def mixture_sweep(sweep: pd.DataFrame, fit: dict, out: Path):
     _save(fig, "Mixture sweep at fixed model size and token budget", out)
 
 
-def mixture_validation(validation: pd.DataFrame, noise_std: dict, out: Path):
-    """Figure 7: test loss of the fresh runs at uniform and at the two predicted-best mixtures.
+def mixture_validation(validation: pd.DataFrame, fit: dict, noise_std: dict, out: Path):
+    """Figure 7: fresh runs at uniform and at the two predicted-best mixtures.
 
-    Error bars are one standard deviation across seeds of the uniform mixture
-    at the same size and budget, so they show how big a difference has to be
-    before it means anything. Dots, not bars: the differences are small and a
-    bar would have to start at zero.
+    The law was fitted on validation loss, so the figure compares predicted
+    and observed validation loss. Error bars are one standard deviation across
+    seeds of the uniform mixture at the same size and budget (measured on
+    test), so they show how big a difference has to be before it means
+    anything. Dots, not bars: the differences are small and a bar would have
+    to start at zero.
     """
+    predicted = {"uniform": fit["predicted_uniform_val"],
+                 "best mean": fit["optimum"]["mean"]["predicted_val"],
+                 "best image": fit["optimum"]["image"]["predicted_val"]}
     fig, axes = plt.subplots(1, 2, figsize=(7.5, 2.8))
-    colors = {"uniform": MUTED, "best mean": DOMAIN_COLORS["image"], "best image": DOMAIN_COLORS["image"]}
     for ax, target in zip(axes, ("mean", "image")):
-        y = range(len(validation))
         for k, (_, r) in enumerate(validation.iterrows()):
-            ax.errorbar(r[f"test_{target}"], k, xerr=noise_std[target], fmt="o", markersize=7, capsize=3,
-                        color=colors[r["label"]])
-        ax.set_yticks(list(y), [f"{r['label']}\n{tuple(round(r[f'h_{d}'], 2) for d in ('image', 'audio', 'text'))}"
-                                for _, r in validation.iterrows()], fontsize=8)
-        ax.set_xlabel(f"{target} test loss (nats per text token)")
+            p = predicted[r["label"]]
+            guess = np.mean(list(p.values())) if target == "mean" else p[target]
+            ax.errorbar(r[f"val_{target}"], k, xerr=noise_std[target], fmt="o", markersize=7, capsize=4,
+                        color=DOMAIN_COLORS["image"], label="observed" if k == 0 else None)
+            ax.plot(guess, k, "o", markersize=9, markerfacecolor="none", color=INK,
+                    label="predicted by the law" if k == 0 else None)
+        ax.set_yticks(range(len(validation)),
+                      [f"{r['label']}\n{tuple(round(r[f'h_{d}'], 2) for d in ('image', 'audio', 'text'))}"
+                       for _, r in validation.iterrows()], fontsize=8)
+        ax.set_xlabel(f"{target} validation loss (nats per text token)")
         ax.grid(axis="y", visible=False)
-        ax.invert_yaxis()
-    _save(fig, "Fresh runs at the predicted-best mixtures and at uniform, with seed spread", out)
+        ax.set_ylim(len(validation) - 0.5, -0.5)
+    axes[-1].legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
+    _save(fig, "Fresh runs (new seed) at uniform and at the predicted-best mixtures", out)
 
 
 def fusion(table: pd.DataFrame, out: Path):

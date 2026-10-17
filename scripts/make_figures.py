@@ -48,13 +48,14 @@ def main():
     else:
         print("fig6 skipped: run the mixture sweep and scripts/fit_mixture.py first")
 
-    if have("mixture_validation.csv", "noise.csv"):
+    if have("mixture_validation.csv", "mixture_fit.json", "noise.csv"):
         # Seed spread of the uniform mixture at the mixture experiment's size and budget.
         noise = pd.read_csv(RESULTS / "noise.csv")
         exp = load_yaml("mixtures")
         cell = noise[(noise["size"] == exp["size"]) & (noise["D_budget"] == exp["tokens"])].iloc[0]
         std = {t: cell[f"test_{t}_std"] for t in ("mean", "image")}
-        plots.mixture_validation(pd.read_csv(RESULTS / "mixture_validation.csv"), std, FIGURES / "fig7_mixture_check.png")
+        fit = json.loads((RESULTS / "mixture_fit.json").read_text())
+        plots.mixture_validation(pd.read_csv(RESULTS / "mixture_validation.csv"), fit, std, FIGURES / "fig7_mixture_check.png")
         print("fig7 done")
     else:
         print("fig7 skipped: run scripts/run_mixture.py validate first")

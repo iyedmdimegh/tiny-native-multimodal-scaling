@@ -98,7 +98,7 @@ Each entry says what was chosen and why, in a few sentences.
 
 **Fresh check runs use a new seed.** The uniform mixture and the two predicted optima are trained again with seed 3, which no sweep run used, so the check is not the same noise the law was fitted on.
 
-**Dots, not bars, in figure 7.** Each mixture has one predicted and one observed value plus a seed spread. Dots with error bars show the gap between them directly, bars would make the eye compare heights from zero, which is meaningless for a loss.
+**Dots, not bars, in figure 7.** Each mixture has one predicted and one observed value plus a seed spread. Dots with error bars show the gap between them directly, bars would make the eye compare heights from zero, which is meaningless for a loss. The figure shows validation loss, because that is what the law was fitted on and predicts. Test loss for the same runs is in the README.
 
 ## Experiment C
 
