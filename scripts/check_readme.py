@@ -53,11 +53,10 @@ def grid_claims() -> dict:
 
     for target in ("image", "audio", "text", "mean"):
         c[f"{target} fit error"] = pct(fits[target]["residual_mare"])
-    for holdout in ("largest N", "largest D"):
-        for target in ("audio", "mean"):
-            h = fits[target]["holdout_mare"][holdout]
-            c[f"{target} {holdout}, law"] = pct(h["law"])
-            c[f"{target} {holdout}, baseline"] = pct(h["baseline"])
+    for target, holdout in (("mean", "largest N"), ("mean", "largest D"), ("audio", "largest D")):
+        h = fits[target]["holdout_mare"][holdout]
+        c[f"{target} {holdout}, law"] = pct(h["law"])
+        c[f"{target} {holdout}, baseline"] = pct(h["baseline"])
     wins = sum(f["holdout_mare"][h]["law"] < f["holdout_mare"][h]["baseline"]
                for f in fits.values() for h in ("largest N", "largest D"))
     c["holdouts the law wins"] = f"{wins} of {2 * len(fits)}"
@@ -90,7 +89,8 @@ def mixture_claims() -> dict:
     check = pd.read_csv(RESULTS / "mixture_validation.csv").set_index("label")
     noise = pd.read_csv(RESULTS / "noise.csv").set_index(["size", "D_budget"]).loc[("S4", 40_000_000)]
 
-    c = {}
+    c = {"mixtures in the sweep": f"{len(pd.read_csv(RESULTS / 'mixtures.csv'))} mixtures",
+         "cross-validation splits": f"{fit['cross_validation_mae']['n_splits']} splits"}
     cv = fit["cross_validation_mae"]
     for i, domain in enumerate(("image", "audio", "text")):
         c[f"{domain} CV error, law"] = f"{cv['law'][i]:.3f}"
@@ -116,7 +116,7 @@ def claims() -> dict:
 
 def numbers_in(text: str) -> list[str]:
     text = re.sub(r"\bS[1-5]\b|\b\d+M\b|[Ff]igure \d", " ", text)
-    return re.findall(r"\d[\d,]*(?:\.\d+)?%?", text)
+    return re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?%?", text)
 
 
 def main():
@@ -125,7 +125,7 @@ def main():
     missing = [f"{name}: {value}" for name, value in c.items() if value not in readme]
     start = readme.find(SECTION)
     section = readme[start:readme.find("\n## ", start + 1)] if start >= 0 else ""
-    allowed = {n for value in c.values() for n in numbers_in(value)}
+    allowed = {n for value in c.values() for n in numbers_in(value)} | {"95%"}  # the bootstrap interval level
     stray = sorted(set(numbers_in(section)) - allowed)
 
     for line in missing:
