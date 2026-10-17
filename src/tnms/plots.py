@@ -190,3 +190,71 @@ def compute_frontier(grid: pd.DataFrame, fits: dict, out: Path, target: str = "m
     ax.set_ylabel(f"{target} test loss (nats per text token)")
     ax.legend(fontsize=8)
     _save(fig, f"{target.capitalize()} test loss against training compute", out)
+
+
+def _ternary(H: np.ndarray):
+    """Shares (image, audio, text) to x, y in a triangle: image bottom left, audio bottom right, text on top."""
+    return H[:, 1] + H[:, 2] / 2, H[:, 2] * np.sqrt(3) / 2
+
+
+def mixture_sweep(sweep: pd.DataFrame, fit: dict, out: Path):
+    """Figure 6: test loss of each domain against its own share, and the predicted mean loss over the simplex.
+
+    The heatmap uses the law fitted on validation loss, the same one used to
+    choose the mixtures, so it shows what the choice was based on.
+    """
+    from tnms.fit import mixture
+
+    fig, axes = plt.subplots(1, 4, figsize=(12, 3.0), gridspec_kw={"width_ratios": [1, 1, 1, 1.25]})
+    for ax, (i, domain) in zip(axes, enumerate(mixture.DOMAINS)):
+        ax.plot(sweep[f"h_{domain}"], sweep[f"test_{domain}"], "o", markersize=5, color=DOMAIN_COLORS[domain])
+        ax.set_xlabel(f"{domain} share of training tokens")
+        ax.set_title(f"{domain}: test loss")
+    axes[0].set_ylabel("loss (nats per text token)")
+
+    grid = mixture.simplex_grid(step=0.01)
+    pred = np.mean([mixture.predict(np.array(fit["params"][d]), grid, i) for i, d in enumerate(mixture.DOMAINS)],
+                   axis=0)
+    ax = axes[3]
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("blues", list(SIZE_COLORS.values()))
+    x, y = _ternary(grid)
+    # The law blows up near the corners, so the colour scale stops at the 90th percentile
+    # (marked by the arrow on the colour bar) to keep the middle of the triangle readable.
+    points = ax.scatter(x, y, c=pred, cmap=cmap, s=4, marker="h", linewidths=0, vmax=np.quantile(pred, 0.9))
+    fig.colorbar(points, ax=ax, label="predicted mean val loss", shrink=0.85, extend="max")
+    tx, ty = _ternary(sweep[[f"h_{d}" for d in mixture.DOMAINS]].to_numpy())
+    ax.plot(tx, ty, "o", markersize=5, markerfacecolor="white", markeredgecolor=INK, label="trained mixtures")
+    for target, marker in (("mean", "*"), ("image", "D")):
+        bx, by = _ternary(np.array([fit["optimum"][target]["h"]]))
+        ax.plot(bx, by, marker, markersize=9 if marker == "*" else 6, color=INK, label=f"predicted best {target}")
+    for label, (vx, vy, ha) in {"image": (0, -0.07, "center"), "audio": (1, -0.07, "center"),
+                                "text": (0.5, np.sqrt(3) / 2 + 0.03, "center")}.items():
+        ax.annotate(label, (vx, vy), ha=ha, color=MUTED, fontsize=8, annotation_clip=False)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.08), ncol=2, columnspacing=0.8)
+    ax.set_title("predicted mean val loss over mixtures", pad=24)
+    _save(fig, "Mixture sweep at fixed model size and token budget", out)
+
+
+def mixture_validation(validation: pd.DataFrame, noise_std: dict, out: Path):
+    """Figure 7: test loss of the fresh runs at uniform and at the two predicted-best mixtures.
+
+    Error bars are one standard deviation across seeds of the uniform mixture
+    at the same size and budget, so they show how big a difference has to be
+    before it means anything. Dots, not bars: the differences are small and a
+    bar would have to start at zero.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(7.5, 2.8))
+    colors = {"uniform": MUTED, "best mean": DOMAIN_COLORS["image"], "best image": DOMAIN_COLORS["image"]}
+    for ax, target in zip(axes, ("mean", "image")):
+        y = range(len(validation))
+        for k, (_, r) in enumerate(validation.iterrows()):
+            ax.errorbar(r[f"test_{target}"], k, xerr=noise_std[target], fmt="o", markersize=7, capsize=3,
+                        color=colors[r["label"]])
+        ax.set_yticks(list(y), [f"{r['label']}\n{tuple(round(r[f'h_{d}'], 2) for d in ('image', 'audio', 'text'))}"
+                                for _, r in validation.iterrows()], fontsize=8)
+        ax.set_xlabel(f"{target} test loss (nats per text token)")
+        ax.grid(axis="y", visible=False)
+        ax.invert_yaxis()
+    _save(fig, "Fresh runs at the predicted-best mixtures and at uniform, with seed spread", out)
