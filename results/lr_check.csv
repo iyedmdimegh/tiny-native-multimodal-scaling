@@ -1,0 +1,7 @@
+size,D_budget,lr,kind,val_mean,test_mean,best_val
+S1,80000000,0.0048,lr_check,1.2409,1.2397,False
+S1,80000000,0.0096,grid,1.2247,1.2244,True
+S1,80000000,0.0192,lr_check,1.2676,1.2673,False
+S5,80000000,0.0003,lr_check,0.78926,0.79366,True
+S5,80000000,0.0006,grid,0.79776,0.80107,False
+S5,80000000,0.0012,lr_check,0.80343,0.80735,False
