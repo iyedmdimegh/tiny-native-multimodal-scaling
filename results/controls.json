@@ -57,5 +57,220 @@
         "with_input": 0.16327593912253582
       }
     }
-  }
+  },
+  "shuffled_labels": {
+    "size": "S2",
+    "tokens": 10000000,
+    "lr": 0.0012,
+    "test_image": 0.34625950848982473,
+    "floor": {
+      "without_input": 0.32898347302752906,
+      "with_input": 0.08549243910834242
+    },
+    "below_floor_by_more_than_tolerance": false,
+    "tolerance": 0.01
+  },
+  "patch_ablation/S4_D80000000_seed0": {
+    "run": "S4_D80000000_seed0",
+    "n_examples": 2000,
+    "image": {
+      "loss": {
+        "real": 0.2640641147544326,
+        "zero": 4.563948211503762,
+        "other": 0.4476365030171219
+      },
+      "floor": {
+        "without_input": 0.32898347302752906,
+        "with_input": 0.08549243910834242
+      }
+    },
+    "audio": {
+      "loss": {
+        "real": 0.30248498284811826,
+        "zero": 4.337582185575744,
+        "other": 1.1063870269989253
+      },
+      "floor": {
+        "without_input": 0.5732426072358568,
+        "with_input": 0.16327593912253582
+      }
+    }
+  },
+  "train_val_gap": [
+    {
+      "size": "S1",
+      "D_budget": 5000000,
+      "image": 0.0082,
+      "audio": -0.0084,
+      "text": -0.0219
+    },
+    {
+      "size": "S2",
+      "D_budget": 5000000,
+      "image": 0.0035,
+      "audio": -0.0077,
+      "text": -0.0225
+    },
+    {
+      "size": "S3",
+      "D_budget": 5000000,
+      "image": 0.0042,
+      "audio": -0.0077,
+      "text": -0.0203
+    },
+    {
+      "size": "S4",
+      "D_budget": 5000000,
+      "image": 0.0049,
+      "audio": -0.007,
+      "text": -0.0201
+    },
+    {
+      "size": "S5",
+      "D_budget": 5000000,
+      "image": 0.0046,
+      "audio": -0.0079,
+      "text": -0.0205
+    },
+    {
+      "size": "S1",
+      "D_budget": 10000000,
+      "image": 0.0034,
+      "audio": -0.0062,
+      "text": -0.0217
+    },
+    {
+      "size": "S2",
+      "D_budget": 10000000,
+      "image": 0.0047,
+      "audio": -0.0087,
+      "text": -0.0197
+    },
+    {
+      "size": "S3",
+      "D_budget": 10000000,
+      "image": 0.004,
+      "audio": -0.0073,
+      "text": -0.0161
+    },
+    {
+      "size": "S4",
+      "D_budget": 10000000,
+      "image": 0.0033,
+      "audio": -0.0074,
+      "text": -0.0142
+    },
+    {
+      "size": "S5",
+      "D_budget": 10000000,
+      "image": 0.0036,
+      "audio": -0.0074,
+      "text": -0.0143
+    },
+    {
+      "size": "S1",
+      "D_budget": 20000000,
+      "image": 0.0037,
+      "audio": -0.0087,
+      "text": -0.0172
+    },
+    {
+      "size": "S2",
+      "D_budget": 20000000,
+      "image": 0.003,
+      "audio": -0.0087,
+      "text": -0.0166
+    },
+    {
+      "size": "S3",
+      "D_budget": 20000000,
+      "image": 0.0019,
+      "audio": -0.0067,
+      "text": -0.0148
+    },
+    {
+      "size": "S4",
+      "D_budget": 20000000,
+      "image": 0.0033,
+      "audio": -0.0071,
+      "text": -0.012
+    },
+    {
+      "size": "S5",
+      "D_budget": 20000000,
+      "image": 0.0023,
+      "audio": -0.0042,
+      "text": -0.0078
+    },
+    {
+      "size": "S1",
+      "D_budget": 40000000,
+      "image": 0.0027,
+      "audio": -0.0089,
+      "text": -0.0187
+    },
+    {
+      "size": "S2",
+      "D_budget": 40000000,
+      "image": 0.003,
+      "audio": -0.0114,
+      "text": -0.0133
+    },
+    {
+      "size": "S3",
+      "D_budget": 40000000,
+      "image": 0.004,
+      "audio": -0.0042,
+      "text": -0.0079
+    },
+    {
+      "size": "S4",
+      "D_budget": 40000000,
+      "image": 0.0059,
+      "audio": -0.0038,
+      "text": 0.0002
+    },
+    {
+      "size": "S5",
+      "D_budget": 40000000,
+      "image": 0.0057,
+      "audio": -0.0046,
+      "text": 0.0049
+    },
+    {
+      "size": "S1",
+      "D_budget": 80000000,
+      "image": 0.0029,
+      "audio": -0.0063,
+      "text": -0.0222
+    },
+    {
+      "size": "S2",
+      "D_budget": 80000000,
+      "image": 0.0036,
+      "audio": -0.0066,
+      "text": -0.0073
+    },
+    {
+      "size": "S3",
+      "D_budget": 80000000,
+      "image": 0.0062,
+      "audio": -0.0018,
+      "text": -0.0014
+    },
+    {
+      "size": "S4",
+      "D_budget": 80000000,
+      "image": 0.0075,
+      "audio": 0.0019,
+      "text": 0.0059
+    },
+    {
+      "size": "S5",
+      "D_budget": 80000000,
+      "image": 0.0115,
+      "audio": 0.0053,
+      "text": 0.012
+    }
+  ]
 }
