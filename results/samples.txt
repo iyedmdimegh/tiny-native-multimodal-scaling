@@ -1,0 +1,36 @@
+Greedy samples from S5_D80000000_seed0. Fixed prompts, every sample kept.
+
+1. Prompt: Once upon a time, there was a little girl named
+   Output: Once upon a time, there was a little girl named Lily. She loved to play outside in the sunshine. One day, she saw a big, red ball in the park. She wanted to play with it, but it was too high for her to reach. 
+
+Lily's mom saw her struggling and asked her what was wrong. Lily told her about the ball and how she could reach it. Her mom said, "Let's go get it for a little while." 
+
+Lily was happy to have her ball back and they went to the park. They played on the swings and the slide and
+
+2. Prompt: Tom and his dog went to the park. They
+   Output: Tom and his dog went to the park. They saw a big slide and wanted to go on it. Tom said, "Let's go on the slide!" Sam said, "No, let's go!" They ran to the slide and climbed up. They slid down fast and laughed.
+
+But then, they saw a big dog. The dog was barking and running towards them. Tom and Sam were scared. They ran to the dog and tried to run away. But the dog was faster and faster. It ran away with the dog and ran away.
+
+Tom and Sam were sad and angry.
+
+3. Prompt: One day, a small bird found
+   Output: One day, a small bird found a big, shiny rock. The bird was very happy and wanted to show the rock to all his friends.
+
+The bird flew to the rock and tried to grab the rock. But the rock was too high for the bird to reach. The bird was sad and could not fly. The bird tried to help the rock, but it could not.
+
+The bird saw a big tree and tried to climb the tree. The tree was very high and could not reach the rock. The bird was sad and could not fly anymore. The bird was sad and could not fly anymore.
+
+4. Prompt: The sun was hot, so Lily wanted to
+   Output: The sun was hot, so Lily wanted to go outside and play. She put on her coat and went outside. She saw a big tree with a hole in it. She wanted to climb it, but she was scared.
+
+Lily's mom saw her and said, "Don't worry, Lily. It's just a hole. It's just a hole. It's not safe." Lily nodded and said, "Okay, mom. I'll be careful."
+
+Lily climbed up the tree and climbed up the tree. She climbed up the tree and climbed up the tree. She was so happy and proud of
+
+5. Prompt: Ben had a red ball. He
+   Output: Ben had a red ball. He liked to kick the ball to each other. He would throw the ball to each other and catch it.
+
+One day, Ben saw a big ball in the park. He wanted to play with it. He ran to the ball and tried to catch it. But the ball was too high. It was too high for him. He could not reach it.
+
+Ben saw a big tree. He wanted to climb the tree. He climbed up the tree and reached the top. He reached the top and looked around. He saw a big tree with a hole in it. He
