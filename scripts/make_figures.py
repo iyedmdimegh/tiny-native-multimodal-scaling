@@ -9,7 +9,7 @@ import json
 import pandas as pd
 
 from tnms import plots
-from tnms.config import REPO_ROOT
+from tnms.config import REPO_ROOT, load_yaml
 
 RESULTS = REPO_ROOT / "results"
 FIGURES = REPO_ROOT / "figures"
@@ -40,6 +40,24 @@ def main():
         print("fig2 to fig5 done")
     else:
         print("fig2 to fig5 skipped: run scripts/fit_scaling.py first")
+
+    if have("mixtures.csv", "mixture_fit.json"):
+        fit = json.loads((RESULTS / "mixture_fit.json").read_text())
+        plots.mixture_sweep(pd.read_csv(RESULTS / "mixtures.csv"), fit, FIGURES / "fig6_mixture_sweep.png")
+        print("fig6 done")
+    else:
+        print("fig6 skipped: run the mixture sweep and scripts/fit_mixture.py first")
+
+    if have("mixture_validation.csv", "noise.csv"):
+        # Seed spread of the uniform mixture at the mixture experiment's size and budget.
+        noise = pd.read_csv(RESULTS / "noise.csv")
+        exp = load_yaml("mixtures")
+        cell = noise[(noise["size"] == exp["size"]) & (noise["D_budget"] == exp["tokens"])].iloc[0]
+        std = {t: cell[f"test_{t}_std"] for t in ("mean", "image")}
+        plots.mixture_validation(pd.read_csv(RESULTS / "mixture_validation.csv"), std, FIGURES / "fig7_mixture_check.png")
+        print("fig7 done")
+    else:
+        print("fig7 skipped: run scripts/run_mixture.py validate first")
 
 
 if __name__ == "__main__":
