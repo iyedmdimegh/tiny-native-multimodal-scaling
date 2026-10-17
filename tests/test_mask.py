@@ -49,3 +49,17 @@ def test_later_patch_changes_earlier_patch_output(fake_datasets, tokenizer):
     batch["image_patches"][0, -1] += 1.0
     after = _logits(model, batch)
     assert not torch.allclose(before[0, 2], after[0, 2])
+
+
+def test_late_fusion_forward_runs_and_reads_patches(fake_datasets):
+    from tnms.data.sequence import collate
+    from tnms.data.tokenizer import load_tokenizer
+
+    torch.manual_seed(0)
+    model = Model(64, 1, 1, encoder_layers=2).eval()
+    train = fake_datasets["train"]
+    batch = collate([train["image"].get(0), train["audio"].get(0), train["text"].get(0)], load_tokenizer())
+    logits = model(batch)
+    assert logits.shape[:2] == batch["input_ids"].shape
+    batch["image_patches"] = torch.zeros_like(batch["image_patches"])
+    assert not torch.allclose(model(batch)[0], logits[0])  # changing the patches changes the image row

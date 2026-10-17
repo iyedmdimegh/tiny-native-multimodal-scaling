@@ -24,3 +24,11 @@ def test_embeddings_are_not_counted():
     embedding = sum(p.numel() for m in (model.tok_emb, model.pos_emb, model.image_proj, model.audio_proj)
                     for p in m.parameters())
     assert count_non_embedding_params(model) == total - embedding
+
+
+def test_late_fusion_with_four_fewer_decoder_layers_matches_n():
+    # Two 2-layer encoders add four blocks, so S3 with 2 decoder layers has the same N as S3.
+    shape = model_shape("S3")
+    early = Model(**shape)
+    late = Model(shape["d_model"], shape["n_layers"] - 4, shape["n_heads"], encoder_layers=2)
+    assert count_non_embedding_params(late) == count_non_embedding_params(early)
