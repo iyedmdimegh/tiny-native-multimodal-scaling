@@ -85,8 +85,33 @@ def grid_claims() -> dict:
     return c
 
 
+def mixture_claims() -> dict:
+    fit = json.loads((RESULTS / "mixture_fit.json").read_text())
+    check = pd.read_csv(RESULTS / "mixture_validation.csv").set_index("label")
+    noise = pd.read_csv(RESULTS / "noise.csv").set_index(["size", "D_budget"]).loc[("S4", 40_000_000)]
+
+    c = {}
+    cv = fit["cross_validation_mae"]
+    for i, domain in enumerate(("image", "audio", "text")):
+        c[f"{domain} CV error, law"] = f"{cv['law'][i]:.3f}"
+        c[f"{domain} CV error, linear"] = f"{cv['linear'][i]:.3f}"
+    c["audio seed std at S4 40M"] = f"{noise['test_audio_std']:.3f}"
+    c["mean seed std at S4 40M"] = f"{noise['test_mean_std']:.3f}"
+    for target, label in (("mean", "best mean"), ("image", "best image")):
+        h = fit["optimum"][target]["h"]
+        c[f"{label} shares"] = "(" + ", ".join(f"{x:g}" for x in h) + ")"
+        p = fit["optimum"][target]["predicted_val"]
+        c[f"{label} predicted val"] = f"{(sum(p.values()) / 3 if target == 'mean' else p[target]):.3f}"
+        c[f"{label} observed val"] = f"{check.loc[label, f'val_{target}']:.3f}"
+        c[f"{label} test"] = f"{check.loc[label, f'test_{target}']:.3f}"
+        c[f"uniform {target} test"] = f"{check.loc['uniform', f'test_{target}']:.3f}"
+    c["best image epochs"] = f"{check.loc['best image', 'epochs_image']:.1f}"
+    c["best image text test"] = f"{check.loc['best image', 'test_text']:.2f}"
+    return c
+
+
 def claims() -> dict:
-    return grid_claims()
+    return {**grid_claims(), **mixture_claims()}
 
 
 def numbers_in(text: str) -> list[str]:
