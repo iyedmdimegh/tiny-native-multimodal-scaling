@@ -256,3 +256,29 @@ def mixture_validation(validation: pd.DataFrame, noise_std: dict, out: Path):
         ax.grid(axis="y", visible=False)
         ax.invert_yaxis()
     _save(fig, "Fresh runs at the predicted-best mixtures and at uniform, with seed spread", out)
+
+
+def fusion(table: pd.DataFrame, out: Path):
+    """Figure 8: early against late fusion at matched N, one panel per domain.
+
+    Small dots are single seeds, the large dot is their mean. Each size gets
+    its own column, early and late side by side.
+    """
+    fig, axes = plt.subplots(1, 4, figsize=(11, 2.6))
+    sizes = sorted(table["size"].unique())
+    colors = {"early": DOMAIN_COLORS["image"], "late": DOMAIN_COLORS["audio"]}
+    for ax, target in zip(axes, TARGETS):
+        for i, size in enumerate(sizes):
+            for j, variant in enumerate(("early", "late")):
+                y = table[(table["size"] == size) & (table["variant"] == variant)][f"test_{target}"]
+                x = 2.5 * i + j
+                ax.plot(np.full(len(y), x), y, "o", markersize=3, color=colors[variant], alpha=0.5)
+                ax.plot(x, y.mean(), "o", markersize=7, color=colors[variant],
+                        label=variant if (i, target) == (0, "mean") else None)
+        ax.set_xticks([2.5 * i + 0.5 for i in range(len(sizes))], sizes)
+        ax.set_xlim(-0.8, 2.5 * (len(sizes) - 1) + 1.8)
+        ax.grid(axis="x", visible=False)
+        ax.set_title(f"{target}: test loss")
+    axes[0].set_ylabel("loss (nats per text token)")
+    axes[-1].legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
+    _save(fig, "Early against late fusion at the same N and D. Small dots are seeds, large dots their mean", out)
