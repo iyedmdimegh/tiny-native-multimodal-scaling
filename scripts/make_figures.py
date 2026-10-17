@@ -59,6 +59,12 @@ def main():
     else:
         print("fig7 skipped: run scripts/run_mixture.py validate first")
 
+    if have("fusion.csv"):
+        plots.fusion(pd.read_csv(RESULTS / "fusion.csv"), FIGURES / "fig8_fusion.png")
+        print("fig8 done")
+    else:
+        print("fig8 skipped: run scripts/run_fusion.py first")
+
 
 if __name__ == "__main__":
     main()
