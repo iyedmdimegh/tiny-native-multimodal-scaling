@@ -81,3 +81,27 @@ Each entry says what was chosen and why, in a few sentences.
 **Sample prompts.** The five prompts in `scripts/run_controls.py` were written before generating anything, and all five outputs go into `results/samples.txt`.
 
 **"Below the floor" needs a margin.** `grid.csv` flags a strict comparison, test loss under the no-input floor. Several small cells are under it by less than 0.001, which is noise, not reading the input. In the write-up a domain only counts as reading the input when its loss is below the floor by more than twice the largest seed standard deviation of that domain over the three noise cells. This rule was fixed before the 40M and 80M runs had finished.
+
+## Mixtures
+
+**A simpler law than the paper's.** The mixture paper (arXiv 2507.09404) fits one law in N, D and the shares together, for example L = E + 1/(sum_i C_i h_i^gamma_i) + A/N^alpha + B/D^beta, so its best mixture can change with model size and budget. Here N and D are fixed (S4, 40M tokens) and there are only 13 runs, too few for a joint law. So each domain gets its own law in the shares only: L_i(h) = E_i + B_i h_i^(-beta_i) + sum over the other domains j of c_ij h_j. The power term says a domain gets better the more of it you train on, with diminishing returns. The linear terms let the other domains help (c < 0) or compete (c > 0). It is my own stand-in, not the paper's law.
+
+**How it is fitted.** Bounded least squares on the loss itself (E, B >= 0, beta between 0.001 and 5), from four starting values of beta, keeping the best. The paper uses a Huber loss with basin hopping. Five parameters per domain and 13 points do not need more than that.
+
+**Fitted on validation loss.** The law picks the mixture, so it is fitted on validation loss. Test loss is only read for the sweep figure and the fresh check runs.
+
+**Linear baseline.** Plain least squares of loss on the three shares without an intercept (the shares sum to one, so an intercept would be redundant). The law must beat it in cross-validation to be worth its extra parameters.
+
+**Leave-3-out over every split.** 13 points allow all 286 ways to hold out 3, so there is no random choice of folds.
+
+**Search on a grid, not by mirror descent.** The paper finds its optimum by mirror descent. With three shares a 0.01 grid is only 3,741 points and cannot get stuck. Every share is kept at 0.05 or more, because the law has no data near zero share and a share of zero would make h^(-beta) infinite.
+
+**Fresh check runs use a new seed.** The uniform mixture and the two predicted optima are trained again with seed 3, which no sweep run used, so the check is not the same noise the law was fitted on.
+
+**Dots, not bars, in figure 7.** Each mixture has one predicted and one observed value plus a seed spread. Dots with error bars show the gap between them directly, bars would make the eye compare heights from zero, which is meaningless for a loss.
+
+## Experiment C
+
+**Late fusion at the same N.** Late fusion gives image and audio a 2-layer encoder each (same block as the decoder, full attention over the patches, own position embeddings) and the decoder loses 4 layers, so the parameter count N is exactly the same, checked by a test. Compute per token is not the same: text passes through 4 fewer layers. That is the price of matching N and is stated next to the result.
+
+**Early-fusion runs are reused.** The early-fusion model is the grid model with the uniform mixture, so its seed 0 runs (and the S4 noise seeds) are taken from the grid. Only the missing seeds are trained.
