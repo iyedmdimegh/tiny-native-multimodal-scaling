@@ -1,0 +1,42 @@
+{
+  "devices": [
+    "NVIDIA GeForce RTX 3050 6GB Laptop GPU"
+  ],
+  "total": {
+    "runs": 87,
+    "gpu_hours": 9.47189393473996,
+    "flops_6ND": 7.882558913844365e+16
+  },
+  "by_group": {
+    "controls": {
+      "runs": 1,
+      "gpu_hours": 0.014207635853025648,
+      "flops_6ND": 47510038905600.0
+    },
+    "fusion": {
+      "runs": 6,
+      "gpu_hours": 0.5814296130339305,
+      "flops_6ND": 6434148132123648.0
+    },
+    "lr_check": {
+      "runs": 4,
+      "gpu_hours": 1.2351390765772927,
+      "flops_6ND": 1.3689541550413056e+16
+    },
+    "lr_sweep": {
+      "runs": 27,
+      "gpu_hours": 1.338882095548842,
+      "flops_6ND": 7208585663589120.0
+    },
+    "mixtures": {
+      "runs": 16,
+      "gpu_hours": 2.7003781814045373,
+      "flops_6ND": 2.411412241235712e+16
+    },
+    "grid": {
+      "runs": 33,
+      "gpu_hours": 3.601857332322332,
+      "flops_6ND": 2.7331681341055104e+16
+    }
+  }
+}
