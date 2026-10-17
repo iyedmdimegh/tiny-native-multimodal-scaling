@@ -110,8 +110,23 @@ def mixture_claims() -> dict:
     return c
 
 
+def fusion_claims() -> dict:
+    table = pd.read_csv(RESULTS / "fusion.csv")
+    means = table.groupby(["size", "variant"]).mean(numeric_only=True)
+    stds = table.groupby(["size", "variant"]).std(numeric_only=True)
+    c = {}
+    for size in table["size"].unique():
+        for variant in ("early", "late"):
+            for target in ("mean", "audio"):
+                c[f"{size} {variant} {target}"] = f"{means.loc[(size, variant), f'test_{target}']:.3f}"
+            c[f"{size} {variant} mean std"] = f"{stds.loc[(size, variant), 'test_mean']:.3f}"
+        saved = 1 - means.loc[(size, "late"), "wall_time_s"] / means.loc[(size, "early"), "wall_time_s"]
+        c[f"{size} late time saved"] = pct(saved)
+    return c
+
+
 def claims() -> dict:
-    return {**grid_claims(), **mixture_claims()}
+    return {**grid_claims(), **mixture_claims(), **fusion_claims()}
 
 
 def numbers_in(text: str) -> list[str]:
